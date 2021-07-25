@@ -1,0 +1,132 @@
+version: '3'
+
+networks:
+  psharing:
+
+services:
+  site:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: psharing_nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www/html:delegated
+      - ./docker/nginx/log:/var/log/nginx/app
+    depends_on:
+      - php
+      - redis
+      - mysql
+      - mailhog
+    networks:
+      - psharing
+
+  mysql:
+    restart: unless-stopped
+    image: mysql:8.0
+    container_name: psharing_mysql
+    command: mysqld --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ''
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - '${DB_PORT}:3306'
+    volumes:
+      - './docker/data/db/mysql:/var/lib/mysql'
+    networks:
+      - psharing
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 4
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: psharing_php
+    volumes:
+      - ./:/var/www/html:delegated
+    networks:
+      - psharing
+
+  redis:
+    image: redis:alpine
+    container_name: psharing_redis
+    restart: unless-stopped
+    ports:
+      - 6379:6379
+    networks:
+      - psharing
+
+  composer:
+    build:
+      context: .
+      dockerfile: docker/composer/Dockerfile
+    container_name: psharing_composer
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - php
+    user: webdev
+    entrypoint: ['composer', '--ignore-platform-reqs']
+    networks:
+      - psharing
+
+  npm:
+    image: node:13.7
+    container_name: psharing_npm
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ['npm']
+    networks:
+      - psharing
+
+  artisan:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: psharing_artisan
+    volumes:
+      - ./:/var/www/html:delegated
+    depends_on:
+      - mysql
+    working_dir: /var/www/html
+    user: webdev
+    entrypoint: ['php', '/var/www/html/artisan']
+    networks:
+      - psharing
+
+  supervisor:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: psharing_supervisor
+    volumes:
+      - ./:/var/www/html:delegated
+      - ./docker/supervisor/logs:/home/webdev/logs/supervisor
+    networks:
+      - psharing
+    depends_on:
+      - redis
+      - mysql
+    command:
+      - /bin/sh
+      - -c
+      - supervisord -c /etc/supervisord.conf
+      - supervisorctl  start all
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: psharing_mailhog
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - psharing
