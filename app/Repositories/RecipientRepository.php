@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Log;
 
 class RecipientRepository
 {
+    public function findById(int $id): ?Recipient
+    {
+        return Recipient::where('id', $id)->first();
+    }
+
     public function findActiveById(int $id): ?Recipient
     {
         return Recipient::active()

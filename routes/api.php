@@ -10,3 +10,4 @@ Route::get('/recipient', [RecipientController::class, 'getAll']);
 Route::get('/recipient/active', [RecipientController::class, 'getActive']);
 Route::post('/recipient', [RecipientController::class, 'store']);
 Route::post('/recipient/channel', [RecipientController::class, 'attachChannel']);
+Route::delete('/recipient/channel', [RecipientController::class, 'detachChannel']);

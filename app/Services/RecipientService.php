@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Channel;
+use App\Models\ChannelRecipient;
 use App\Models\Recipient;
 use App\Repositories\RecipientRepository;
 use Illuminate\Support\Facades\DB;
@@ -41,5 +42,12 @@ class RecipientService
 
             throw new \Exception('An error occurred during processing. Please try again later.');
         }
+    }
+
+    public function detachChannel(Recipient $recipient, Channel $channel)
+    {
+        ChannelRecipient::where('recipient_id', $recipient->id)
+            ->where('channel_id', $channel->id)
+            ->delete();
     }
 }
