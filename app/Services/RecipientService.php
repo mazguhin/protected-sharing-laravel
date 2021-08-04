@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 
 class RecipientService
 {
-    private $recipientRepository;
+    private RecipientRepository $recipientRepository;
 
     public function __construct(RecipientRepository $recipientRepository)
     {
