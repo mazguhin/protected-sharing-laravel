@@ -11,7 +11,10 @@ class CreateRecordsTable extends Migration
         Schema::create('records', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('recipient_id')->nullable();
+            $table->unsignedBigInteger('channel_id')->nullable();
             $table->text('data');
+            $table->string('identifier', 255)->unique();
+            $table->string('password', 255);
             $table->dateTime('deadline_at')->nullable();
             $table->string('author_ip')->nullable();
             $table->timestamps();

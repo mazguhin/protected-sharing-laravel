@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\Record\StoreRecord;
+use App\Models\Channel;
+use App\Models\Recipient;
+use App\Services\Record\RecordException;
+use App\Services\Record\RecordService;
 use Illuminate\Http\JsonResponse;
 
 class RecordController extends Controller
@@ -34,12 +38,31 @@ class RecordController extends Controller
      *      )
      * )
      * @param StoreRecord $request
+     * @param RecordService $recordService
      * @return JsonResponse
      */
     public function store(
-        StoreRecord $request
-    )
+        StoreRecord $request,
+        RecordService $recordService
+    ): JsonResponse
     {
-        return $this->success([]);
+        $recipient = Recipient::find($request->recipient_id);
+        $channel = Channel::find($request->channel_id);
+        $password = $recordService->generatePassword();
+
+        try {
+            $record = $recordService->store($recipient, $channel, $password, $request->validated());
+            $recordService->send($record, $password);
+        } catch (RecordException $e) {
+            return $this->error($e->getMessage());
+        } catch (\Exception $e) {
+            return $this->error('Возникла ошибка на сервере. Повторите попытку позже.');
+        }
+
+        return $this->success([
+            'record' => [
+                'identifier' => $record->identifier
+            ]
+        ]);
     }
 }

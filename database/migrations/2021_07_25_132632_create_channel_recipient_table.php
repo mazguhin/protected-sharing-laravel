@@ -12,7 +12,7 @@ class CreateChannelRecipientTable extends Migration
             $table->id();
             $table->unsignedBigInteger('channel_id')->index();
             $table->unsignedBigInteger('recipient_id')->index();
-            $table->string('data', 255)->nullable();
+            $table->string('data', 255);
 
             $table->unique(['channel_id', 'recipient_id']);
         });

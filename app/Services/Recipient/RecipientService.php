@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Recipient;
 
 use App\Models\Channel;
 use App\Models\ChannelRecipient;
@@ -21,6 +21,14 @@ class RecipientService
     public function checkChannelAttached(Recipient $recipient, Channel $channel): bool
     {
         return $this->recipientRepository->channelIsAttached($recipient, $channel);
+    }
+
+    public function getChannelRecipientRecord(Recipient $recipient, Channel $channel): ChannelRecipient
+    {
+        return ChannelRecipient::query()
+            ->channel($channel->id)
+            ->recipient($recipient->id)
+            ->first();
     }
 
     public function attachChannel(Recipient $recipient, Channel $channel, string $data): Recipient

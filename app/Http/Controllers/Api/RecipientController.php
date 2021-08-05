@@ -7,7 +7,7 @@ use App\Http\Requests\Api\Recipient\DetachChannelFromRecipient;
 use App\Http\Requests\Api\Recipient\StoreRecipient;
 use App\Repositories\ChannelRepository;
 use App\Repositories\RecipientRepository;
-use App\Services\RecipientService;
+use App\Services\Recipient\RecipientService;
 use Illuminate\Http\JsonResponse;
 
 class RecipientController extends Controller
