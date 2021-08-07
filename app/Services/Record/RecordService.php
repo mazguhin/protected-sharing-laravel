@@ -40,7 +40,7 @@ class RecordService
             throw new RecordException('Данный канал недоступен');
         }
 
-        $record = DB::transaction(function() use ($data, $password) {
+        $record = DB::transaction(function () use ($data, $password) {
             $record = $this->recordRepository->store($data, $password);
             $record = $this->setDeadlineByMinutes($record, $data['minutes'] ?? null);
             return $record;
@@ -84,6 +84,18 @@ class RecordService
         } catch (\Exception $e) {
             throw new RecordException('Возникла ошибка при отправке пароля');
         }
+    }
+
+    public function disableExpiredRecords(): void
+    {
+        $now = (new \DateTime())->format('Y-m-d H:i:s');
+        Record::query()
+            ->active()
+            ->where('deadline_at', '<', $now)
+            ->update([
+                'data' => '',
+                'is_active' => 0
+            ]);
     }
 
 }

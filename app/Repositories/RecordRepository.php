@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Record;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

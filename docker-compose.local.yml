@@ -108,6 +108,7 @@ services:
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: psharing_supervisor
+    user: root
     volumes:
       - ./:/var/www/html:delegated
       - ./docker/supervisor/logs:/home/webdev/logs/supervisor

@@ -17,6 +17,7 @@ class CreateRecordsTable extends Migration
             $table->string('password', 255);
             $table->dateTime('deadline_at')->nullable();
             $table->string('author_ip')->nullable();
+            $table->tinyInteger('is_active')->default(true);
             $table->timestamps();
         });
     }

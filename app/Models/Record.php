@@ -13,6 +13,7 @@ class Record extends Model
 
     protected $casts = [
         'deadline_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function recipient()
@@ -23,5 +24,15 @@ class Record extends Model
     public function channel()
     {
         return $this->belongsTo(Channel::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', 1);
+    }
+
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', 0);
     }
 }
