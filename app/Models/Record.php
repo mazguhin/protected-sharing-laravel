@@ -6,8 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Record extends Model
 {
+    public const DEADLINE_MINUTES_DEFAULT = 5;
+
     protected $table = 'records';
-    protected $fillable = ['recipient_id', 'channel_id', 'deadline_at'];
+    protected $fillable = ['recipient_id', 'channel_id', 'deadline_at', 'author_ip'];
 
     protected $casts = [
         'deadline_at' => 'datetime',

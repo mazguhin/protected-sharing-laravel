@@ -14,6 +14,7 @@ class StoreRecord extends BaseRequest
     {
         return [
             'data' => 'required|max:3000',
+            'minutes' => 'nullable|integer|min:1|max:4320',
             'recipient_id' => [
                 'required',
                 'integer',

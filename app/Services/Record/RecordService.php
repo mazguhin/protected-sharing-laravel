@@ -8,6 +8,7 @@ use App\Models\Record;
 use App\Repositories\RecordRepository;
 use App\Services\Channel\ChannelService;
 use App\Services\Recipient\RecipientService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class RecordService
@@ -39,12 +40,25 @@ class RecordService
             throw new RecordException('Данный канал недоступен');
         }
 
-        $record = $this->recordRepository->store($data, $password);
+        $record = DB::transaction(function() use ($data, $password) {
+            $record = $this->recordRepository->store($data, $password);
+            $record = $this->setDeadlineByMinutes($record, $data['minutes'] ?? null);
+            return $record;
+        });
 
         if (!$record) {
             throw new RecordException('Возникла ошибка при создании записи');
         }
 
+        return $record;
+    }
+
+    public function setDeadlineByMinutes(Record $record, $minutes): Record
+    {
+        $minutes = $minutes ? (int)$minutes : Record::DEADLINE_MINUTES_DEFAULT;
+        $deadline = (new \DateTime())->modify("+ $minutes minutes");
+        $record->deadline_at = $deadline->format('Y-m-d H:i:s');
+        $record->save();
         return $record;
     }
 

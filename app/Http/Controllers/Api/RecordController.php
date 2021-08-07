@@ -23,7 +23,8 @@ class RecordController extends Controller
      *          required={"data", "recipient_id", "channel_id"},
      *          @OA\Property(property="data", type="string", format="string", example="text"),
      *          @OA\Property(property="recipient_id", type="integer", format="string", example="1"),
-     *          @OA\Property(property="channel_id", type="integer", format="string", example="2"),
+     *          @OA\Property(property="channel_id", type="integer", format="string", example="1"),
+     *          @OA\Property(property="minutes", type="integer", format="string", example="15"),
      *        )
      *      ),
      *      @OA\Response(
@@ -51,7 +52,10 @@ class RecordController extends Controller
         $password = $recordService->generatePassword();
 
         try {
-            $record = $recordService->store($recipient, $channel, $password, $request->validated());
+            $record = $recordService->store($recipient, $channel, $password, array_merge($request->validated(), [
+                'author_ip' => $request->getClientIp(),
+            ]));
+
             $recordService->send($record, $password);
         } catch (RecordException $e) {
             return $this->error($e->getMessage());
