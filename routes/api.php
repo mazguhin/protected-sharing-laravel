@@ -14,3 +14,4 @@ Route::post('/recipient/channel', [RecipientController::class, 'attachChannel'])
 Route::delete('/recipient/channel', [RecipientController::class, 'detachChannel']);
 
 Route::post('/record', [RecordController::class, 'store']);
+Route::post('/record/{identifier}/accept', [RecordController::class, 'accept']);

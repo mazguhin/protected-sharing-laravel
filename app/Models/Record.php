@@ -35,4 +35,9 @@ class Record extends Model
     {
         return $query->where('is_active', 0);
     }
+
+    public function scopeIdentifier($query, $identifier)
+    {
+        return $query->where('identifier', $identifier);
+    }
 }

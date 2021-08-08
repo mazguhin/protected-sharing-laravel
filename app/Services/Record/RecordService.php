@@ -8,7 +8,9 @@ use App\Models\Record;
 use App\Repositories\RecordRepository;
 use App\Services\Channel\ChannelService;
 use App\Services\Recipient\RecipientService;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class RecordService
@@ -62,7 +64,7 @@ class RecordService
         return $record;
     }
 
-    public function send(Record $record, $password): void
+    public function sendToRecipient(Record $record, $password): void
     {
         $recipient = $record->recipient;
         $channel = $record->channel;
@@ -86,6 +88,14 @@ class RecordService
         }
     }
 
+    public function disable(Record $record): Record
+    {
+        $record->data = '';
+        $record->is_active = 0;
+        $record->save();
+        return $record;
+    }
+
     public function disableExpiredRecords(): void
     {
         $now = (new \DateTime())->format('Y-m-d H:i:s');
@@ -98,4 +108,13 @@ class RecordService
             ]);
     }
 
+    public function checkPassword(Record $record, string $password): bool
+    {
+        return Hash::check($password, $record->password);
+    }
+
+    public function getData(Record $record): string
+    {
+        return Crypt::decryptString($record->data);
+    }
 }
