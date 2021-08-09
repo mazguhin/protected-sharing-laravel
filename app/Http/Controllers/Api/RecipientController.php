@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\Recipient\AttachChannelToRecipient;
+use App\Http\Requests\Api\Recipient\DeleteRecipient;
 use App\Http\Requests\Api\Recipient\DetachChannelFromRecipient;
 use App\Http\Requests\Api\Recipient\StoreRecipient;
+use App\Http\Requests\Api\Recipient\UpdateRecipient;
 use App\Repositories\ChannelRepository;
 use App\Repositories\RecipientRepository;
 use App\Services\Recipient\RecipientService;
@@ -12,6 +14,18 @@ use Illuminate\Http\JsonResponse;
 
 class RecipientController extends Controller
 {
+    private RecipientRepository $recipientRepository;
+    private RecipientService $recipientService;
+
+    public function __construct(
+        RecipientRepository $recipientRepository,
+        RecipientService $recipientService
+    )
+    {
+        $this->recipientRepository = $recipientRepository;
+        $this->recipientService = $recipientService;
+    }
+
     /**
      * @OA\Get(
      *      path="/recipient",
@@ -29,12 +43,11 @@ class RecipientController extends Controller
      *        )
      *      )
      * )
-     * @param RecipientRepository $recipientRepository
      * @return JsonResponse
      */
-    public function getAll(RecipientRepository $recipientRepository)
+    public function getAll(): JsonResponse
     {
-        $recipients = $recipientRepository->findAll();
+        $recipients = $this->recipientRepository->findAll();
 
         return $this->success([
             'recipients' => $recipients
@@ -58,12 +71,11 @@ class RecipientController extends Controller
      *        )
      *      )
      * )
-     * @param RecipientRepository $recipientRepository
      * @return JsonResponse
      */
-    public function getActive(RecipientRepository $recipientRepository)
+    public function getActive()
     {
-        $recipients = $recipientRepository->findActive();
+        $recipients = $this->recipientRepository->findActive();
 
         return $this->success([
             'recipients' => $recipients
@@ -95,18 +107,14 @@ class RecipientController extends Controller
      *      )
      * )
      * @param StoreRecipient $request
-     * @param RecipientRepository $recipientRepository
      * @return JsonResponse
      */
-    public function store(
-        StoreRecipient $request,
-        RecipientRepository $recipientRepository
-    )
+    public function store(StoreRecipient $request)
     {
         $recipient = null;
 
         try {
-            $recipient = $recipientRepository->create($request->validated());
+            $recipient = $this->recipientRepository->create($request->validated());
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -143,28 +151,24 @@ class RecipientController extends Controller
      *      )
      * )
      * @param AttachChannelToRecipient $request
-     * @param RecipientRepository $recipientRepository
      * @param ChannelRepository $channelRepository
-     * @param RecipientService $recipientService
      * @return JsonResponse
      */
     public function attachChannel(
         AttachChannelToRecipient $request,
-        RecipientRepository $recipientRepository,
-        ChannelRepository $channelRepository,
-        RecipientService $recipientService
-    )
+        ChannelRepository $channelRepository
+    ): JsonResponse
     {
-        $recipient = $recipientRepository->findActiveById($request->recipient_id);
+        $recipient = $this->recipientRepository->findActiveById($request->recipient_id);
         $channel = $channelRepository->findActiveById($request->channel_id);
 
-        $channelIsAttached = $recipientService->checkChannelAttached($recipient, $channel);
+        $channelIsAttached = $this->recipientService->checkChannelAttached($recipient, $channel);
         if ($channelIsAttached) {
             return $this->error('The channel is already attached');
         }
 
         try {
-            $recipient = $recipientService->attachChannel($recipient, $channel, $request->data);
+            $recipient = $this->recipientService->attachChannel($recipient, $channel, $request->data);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -200,23 +204,19 @@ class RecipientController extends Controller
      *      )
      * )
      * @param DetachChannelFromRecipient $request
-     * @param RecipientRepository $recipientRepository
      * @param ChannelRepository $channelRepository
-     * @param RecipientService $recipientService
      * @return JsonResponse
      */
     public function detachChannel(
         DetachChannelFromRecipient $request,
-        RecipientRepository $recipientRepository,
-        ChannelRepository $channelRepository,
-        RecipientService $recipientService
-    )
+        ChannelRepository $channelRepository
+    ):JsonResponse
     {
-        $recipient = $recipientRepository->findById($request->recipient_id);
+        $recipient = $this->recipientRepository->findById($request->recipient_id);
         $channel = $channelRepository->findById($request->channel_id);
 
         try {
-            $recipientService->detachChannel($recipient, $channel);
+            $this->recipientService->detachChannel($recipient, $channel);
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 500);
         }
@@ -224,5 +224,98 @@ class RecipientController extends Controller
         return $this->success([
             'recipient' => $recipient,
         ]);
+    }
+
+    /**
+     * @OA\Put(
+     *      path="/recipient/{id}",
+     *      operationId="updateRecipient",
+     *      tags={"Recipient"},
+     *      summary="Update recipient by id",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Recipient ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *        required=true,
+     *        @OA\JsonContent(
+     *          @OA\Property(property="name", type="string", format="string", example="Name"),
+     *          @OA\Property(property="is_active", type="integer", format="integer", example="1")
+     *        )
+     *      ),
+     *      @OA\Response(
+     *        response=200,
+     *        description="Успех",
+     *        @OA\JsonContent(
+     *          @OA\Property(property="success", type="boolean", example="true"),
+     *          @OA\Property(
+     *              property="data", type="object", example="{}",
+     *          )
+     *        )
+     *      )
+     * )
+     * @param UpdateRecipient $request
+     * @return JsonResponse
+     */
+    public function update(UpdateRecipient $request): JsonResponse
+    {
+        $recipient = $this->recipientRepository->findById($request->id);
+
+        try {
+            $recipient = $this->recipientService->update($recipient, $request->validated());
+        } catch (\Exception $e) {
+            return $this->error('Возникла ошибка при обновлении получателя');
+        }
+
+        return $this->success([
+            'recipient' => $recipient,
+        ]);
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/recipient/{id}",
+     *      operationId="deleteRecipient",
+     *      tags={"Recipient"},
+     *      summary="Delete recipient by id",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Recipient ID",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *        response=200,
+     *        description="Успех",
+     *        @OA\JsonContent(
+     *          @OA\Property(property="success", type="boolean", example="true"),
+     *          @OA\Property(
+     *              property="data", type="object", example="{}",
+     *          )
+     *        )
+     *      )
+     * )
+     * @param DeleteRecipient $request
+     * @return JsonResponse
+     */
+    public function delete(DeleteRecipient $request): JsonResponse
+    {
+        $recipient = $this->recipientRepository->findById($request->id);
+
+        try {
+            $this->recipientService->delete($recipient);
+        } catch (\Exception $e) {
+            return $this->error('Возникла ошибка при удалении получателя');
+        }
+
+        return $this->success();
     }
 }

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Channel;
 use App\Models\ChannelRecipient;
 use App\Models\Recipient;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class RecipientRepository
@@ -21,12 +22,12 @@ class RecipientRepository
             ->first();
     }
 
-    public function findAll(): array
+    public function findAll(): Collection
     {
         return Recipient::all();
     }
 
-    public function findActive(): array
+    public function findActive(): Collection
     {
         return Recipient::active()->get();
     }

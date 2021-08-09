@@ -7,11 +7,13 @@ use App\Http\Controllers\Api\MainController;
 
 Route::get('/', [MainController::class, 'index']);
 
-Route::get('/recipient', [RecipientController::class, 'getAll']);
-Route::get('/recipient/active', [RecipientController::class, 'getActive']);
-Route::post('/recipient', [RecipientController::class, 'store']);
-Route::post('/recipient/channel', [RecipientController::class, 'attachChannel']);
-Route::delete('/recipient/channel', [RecipientController::class, 'detachChannel']);
+Route::get('/recipient', [RecipientController::class, 'getAll'])->name('recipient.get-all');
+Route::get('/recipient/active', [RecipientController::class, 'getActive'])->name('recipient.get-active');
+Route::post('/recipient', [RecipientController::class, 'store'])->name('recipient.store');
+Route::put('/recipient/{id}', [RecipientController::class, 'update'])->name('recipient.update');
+Route::delete('/recipient/{id}', [RecipientController::class, 'delete'])->name('recipient.delete');
+Route::post('/recipient/channel', [RecipientController::class, 'attachChannel'])->name('recipient.attach-channel');
+Route::delete('/recipient/channel', [RecipientController::class, 'detachChannel'])->name('recipient.detach-channel');
 
-Route::post('/record', [RecordController::class, 'store']);
-Route::post('/record/{identifier}/accept', [RecordController::class, 'accept']);
+Route::post('/record', [RecordController::class, 'store'])->name('record.store');
+Route::post('/record/{identifier}/accept', [RecordController::class, 'accept'])->name('record.accept');

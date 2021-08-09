@@ -18,6 +18,23 @@ class RecipientService
         $this->recipientRepository = $recipientRepository;
     }
 
+    public function create($data): Recipient
+    {
+        return $this->recipientRepository->create($data);
+    }
+
+    public function update(Recipient $recipient, $data): Recipient
+    {
+        $recipient->fill($data);
+        $recipient->save();
+        return $recipient;
+    }
+
+    public function delete(Recipient $recipient): bool
+    {
+        return $recipient->delete();
+    }
+
     public function checkChannelAttached(Recipient $recipient, Channel $channel): bool
     {
         return $this->recipientRepository->channelIsAttached($recipient, $channel);
