@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\Recipient\AttachChannelToRecipient;
 use App\Http\Requests\Api\Recipient\DeleteRecipient;
+use App\Http\Resources\Recipient\Recipient as RecipientResource;
 use App\Http\Requests\Api\Recipient\DetachChannelFromRecipient;
 use App\Http\Requests\Api\Recipient\StoreRecipient;
 use App\Http\Requests\Api\Recipient\UpdateRecipient;
+use App\Http\Resources\Recipient\RecipientCollection;
 use App\Repositories\ChannelRepository;
 use App\Repositories\RecipientRepository;
 use App\Services\Recipient\RecipientService;
@@ -50,7 +52,7 @@ class RecipientController extends Controller
         $recipients = $this->recipientRepository->findAll();
 
         return $this->success([
-            'recipients' => $recipients
+            'recipients' => new RecipientCollection($recipients),
         ]);
     }
 
@@ -78,7 +80,7 @@ class RecipientController extends Controller
         $recipients = $this->recipientRepository->findActive();
 
         return $this->success([
-            'recipients' => $recipients
+            'recipients' => new RecipientCollection($recipients),
         ]);
     }
 
@@ -120,7 +122,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -174,7 +176,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -222,7 +224,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -273,7 +275,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 

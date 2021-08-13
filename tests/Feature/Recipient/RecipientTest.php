@@ -2,10 +2,15 @@
 
 namespace Tests\Feature\Recipient;
 
+use App\Models\Channel;
+use App\Models\ChannelRecipient;
 use App\Models\Recipient;
+use App\Http\Resources\Recipient\Recipient as RecipientResource;
+use App\Services\Channel\ChannelType;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class RecipientTest extends TestCase
@@ -14,41 +19,51 @@ class RecipientTest extends TestCase
 
     public function test_get_all()
     {
-        Recipient::factory()->count(3)->create();
+        $count = 3;
+        $recipientsSource = Recipient::factory()->count($count)->create();
 
         $response = $this->get(route('recipient.get-all'));
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
 
-        // TODO: проверить получателей в массиве recipients
+        $content = $response->json();
+        $recipientArray = $content['data']['recipients'];
+        $this->assertCount($count, $recipientArray);
+
+        foreach ($recipientsSource as $key => $recipientSourceItem) {
+            $this->assertEquals(
+                (new RecipientResource($recipientSourceItem))->jsonSerialize(),
+                $recipientArray[$key]
+            );
+        }
     }
 
     public function test_get_active()
     {
-        Recipient::factory()->count(3)->create();
+        $count = 3;
+        $inactiveRecipient = Recipient::factory()->inactive()->create();
+        $recipientsSource = Recipient::factory()->count($count)->create();
 
         $response = $this->get(route('recipient.get-active'));
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
 
-        // TODO: проверить получателей в массиве recipients
-    }
+        $content = $response->json();
+        $recipientArray = $content['data']['recipients'];
+        $this->assertCount($count, $recipientArray);
 
-    public function test_get_active_empty_list()
-    {
-        Recipient::factory()->inactive()->count(3)->create();
-
-        $response = $this->get(route('recipient.get-active'));
-        $response->assertStatus(200);
-        $response->assertJsonFragment(['success' => true]);
-
-        // TODO: проверить получателей в массиве recipients
+        foreach ($recipientsSource as $key => $recipientSourceItem) {
+            $this->assertEquals(
+                (new RecipientResource($recipientSourceItem))->jsonSerialize(),
+                $recipientArray[$key]
+            );
+        }
     }
 
     public function test_store()
     {
-        $recipient = Recipient::factory()->make();
-        $data = $recipient->attributesToArray();
+        $recipientSource = Recipient::factory()->make();
+        $data = $recipientSource->attributesToArray();
 
         $response = $this->post(route('recipient.store'), $data);
 
@@ -56,5 +71,94 @@ class RecipientTest extends TestCase
         $response->assertJsonFragment(['success' => true]);
 
         $this->assertDatabaseHas((new Recipient())->getTable(), $data);
+    }
+
+    public function test_attach_channel()
+    {
+        $recipientSource = Recipient::factory()->create();
+        $channelSource = Channel::factory([
+            'name' => ChannelType::TELEGRAM
+        ])->create();
+
+        $data = [
+            'recipient_id' => $recipientSource->id,
+            'channel_id' => $channelSource->id,
+            'data' => Str::random(),
+        ];
+
+        $response = $this->post(route('recipient.attach-channel'), $data);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseHas((new ChannelRecipient())->getTable(), $data);
+    }
+
+    public function test_detach_channel()
+    {
+        $recipientSource = Recipient::factory()->create();
+        $channelSource = Channel::factory([
+            'name' => ChannelType::TELEGRAM
+        ])->create();
+
+        $data = [
+            'recipient_id' => $recipientSource->id,
+            'channel_id' => $channelSource->id,
+        ];
+
+        ChannelRecipient::factory(array_merge($data, [
+            'data' => Str::random(),
+        ]))->create();
+
+        $response = $this->delete(route('recipient.detach-channel'), $data);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseMissing((new ChannelRecipient())->getTable(), $data);
+    }
+
+    public function test_update()
+    {
+        $recipientSource = Recipient::factory()->create();
+
+        $data = [
+            'name' => $this->faker->firstName(),
+            'is_active' => false,
+        ];
+
+        $response = $this->put(
+            route('recipient.update', [
+                'id' => $recipientSource->id
+            ]),
+            $data
+        );
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseHas(
+            (new Recipient())->getTable(),
+            array_merge($recipientSource->attributesToArray(), $data)
+        );
+    }
+
+    public function test_delete()
+    {
+        $recipientSource = Recipient::factory()->create();
+
+        $response = $this->delete(
+            route('recipient.delete', [
+                'id' => $recipientSource->id
+            ]),
+        );
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseMissing(
+            (new Recipient())->getTable(),
+            $recipientSource->attributesToArray()
+        );
     }
 }
