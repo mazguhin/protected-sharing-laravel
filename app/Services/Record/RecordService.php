@@ -30,11 +30,6 @@ class RecordService
         $this->recordRepository = $recordRepository;
     }
 
-    public function generatePassword(): string
-    {
-        return Str::random(8);
-    }
-
     public function store(Recipient $recipient, Channel $channel, $password, $data = []): Record
     {
         $channelAttached = $this->recipientService->checkChannelAttached($recipient, $channel);

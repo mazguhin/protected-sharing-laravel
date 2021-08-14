@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\PasswordHelper;
 use App\Http\Requests\Api\Record\AcceptRecord;
 use App\Http\Requests\Api\Record\StoreRecord;
 use App\Models\Channel;
@@ -42,16 +43,18 @@ class RecordController extends Controller
      * )
      * @param StoreRecord $request
      * @param RecordService $recordService
+     * @param PasswordHelper $passwordHelper
      * @return JsonResponse
      */
     public function store(
         StoreRecord $request,
-        RecordService $recordService
+        RecordService $recordService,
+        PasswordHelper $passwordHelper
     ): JsonResponse
     {
         $recipient = Recipient::find($request->recipient_id);
         $channel = Channel::find($request->channel_id);
-        $password = $recordService->generatePassword();
+        $password = $passwordHelper->generatePassword();
 
         try {
             $record = $recordService->store($recipient, $channel, $password, array_merge($request->validated(), [
