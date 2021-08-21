@@ -10,7 +10,6 @@ use App\Models\Record;
 use App\Services\Channel\ChannelType;
 use App\Services\Channel\Telegram\Providers\TelegramTestProvider;
 use App\Services\Channel\Telegram\TelegramChannelContract;
-use App\Services\Record\RecordService;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -70,7 +69,7 @@ class RecordTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
-        $this->assertNotEmpty($identifier);
+        self::assertNotEmpty($identifier);
 
         $this->assertDatabaseHas((new Record())->getTable(), $data);
 
@@ -84,6 +83,6 @@ class RecordTest extends TestCase
         $responseSecretData = $response->json('data.data');
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
-        $this->assertEquals($secretData, $responseSecretData);
+        self::assertEquals($secretData, $responseSecretData);
     }
 }
