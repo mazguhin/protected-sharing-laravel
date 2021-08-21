@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Recipient\DeleteRecipient;
 use App\Http\Requests\Api\Recipient\DetachChannelFromRecipient;
 use App\Http\Requests\Api\Recipient\StoreRecipient;
 use App\Http\Requests\Api\Recipient\UpdateRecipient;
+use App\Http\Resources\Recipient\RecipientResource;
 use App\Repositories\ChannelRepository;
 use App\Repositories\RecipientRepository;
 use App\Services\Recipient\RecipientService;
@@ -50,7 +51,7 @@ class RecipientController extends Controller
         $recipients = $this->recipientRepository->findAll();
 
         return $this->success([
-            'recipients' => $recipients
+            'recipients' => RecipientResource::collection($recipients),
         ]);
     }
 
@@ -73,12 +74,12 @@ class RecipientController extends Controller
      * )
      * @return JsonResponse
      */
-    public function getActive()
+    public function getActive(): JsonResponse
     {
         $recipients = $this->recipientRepository->findActive();
 
         return $this->success([
-            'recipients' => $recipients
+            'recipients' => RecipientResource::collection($recipients),
         ]);
     }
 
@@ -109,7 +110,7 @@ class RecipientController extends Controller
      * @param StoreRecipient $request
      * @return JsonResponse
      */
-    public function store(StoreRecipient $request)
+    public function store(StoreRecipient $request): JsonResponse
     {
         $recipient = null;
 
@@ -120,7 +121,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -174,7 +175,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -222,7 +223,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 
@@ -273,7 +274,7 @@ class RecipientController extends Controller
         }
 
         return $this->success([
-            'recipient' => $recipient,
+            'recipient' => new RecipientResource($recipient),
         ]);
     }
 

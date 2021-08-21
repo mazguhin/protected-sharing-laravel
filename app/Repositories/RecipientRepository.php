@@ -24,12 +24,12 @@ class RecipientRepository
 
     public function findAll(): Collection
     {
-        return Recipient::all();
+        return Recipient::orderBy('id', 'asc')->get();
     }
 
     public function findActive(): Collection
     {
-        return Recipient::active()->get();
+        return Recipient::orderBy('id', 'asc')->active()->get();
     }
 
     public function channelIsAttached(Recipient $recipient, Channel $channel): bool
