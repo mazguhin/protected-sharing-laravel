@@ -11,6 +11,7 @@ class ChannelRecipient extends Model
 
     protected $table = 'channel_recipient';
     protected $fillable = ['channel_id', 'recipient_id'];
+    public $timestamps = false;
 
     public function scopeRecipient($query, $recipientId)
     {
