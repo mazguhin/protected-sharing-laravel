@@ -2,10 +2,15 @@
 
 namespace Tests\Feature\Recipient;
 
+use App\Http\Resources\Recipient\RecipientResource;
+use App\Models\Channel;
+use App\Models\ChannelRecipient;
 use App\Models\Recipient;
+use App\Services\Channel\ChannelType;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class RecipientTest extends TestCase
@@ -23,10 +28,10 @@ class RecipientTest extends TestCase
 
         $content = $response->json();
         $recipientArray = $content['data']['recipients'];
-        $this->assertCount($count, $recipientArray);
+        self::assertCount($count, $recipientArray);
 
         foreach ($recipientsSource as $key => $recipientSourceItem) {
-            $this->assertEquals(
+            self::assertEquals(
                 (new RecipientResource($recipientSourceItem))->jsonSerialize(),
                 $recipientArray[$key]
             );
@@ -45,10 +50,10 @@ class RecipientTest extends TestCase
 
         $content = $response->json();
         $recipientArray = $content['data']['recipients'];
-        $this->assertCount($count, $recipientArray);
+        self::assertCount($count, $recipientArray);
 
         foreach ($recipientsSource as $key => $recipientSourceItem) {
-            $this->assertEquals(
+            self::assertEquals(
                 (new RecipientResource($recipientSourceItem))->jsonSerialize(),
                 $recipientArray[$key]
             );
