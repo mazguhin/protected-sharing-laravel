@@ -5,6 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Recipient
+ * @package App\Models
+ * @property string $title
+ * @property string $name
+ * @property \DateTime $created_at
+ * @property \DateTime $updated_at
+ */
 class Recipient extends Model
 {
     use HasFactory;

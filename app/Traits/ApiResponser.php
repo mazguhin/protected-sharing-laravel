@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,12 +18,11 @@ trait ApiResponser
     /**
      * Return a success JSON response.
      *
-     * @param  array|string  $data
-     * @param  string  $message
-     * @param  int|null  $code
-     * @return \Illuminate\Http\JsonResponse
+     * @param array $data
+     * @param int $code
+     * @return JsonResponse
      */
-    protected function success($data = null, int $code = 200)
+    protected function success($data = [], int $code = 200): JsonResponse
     {
         $params = [
             'success' => true,
@@ -37,12 +36,12 @@ trait ApiResponser
     /**
      * Return an error JSON response.
      *
-     * @param  string  $message
-     * @param  int  $code
-     * @param  array|string|null  $data
-     * @return \Illuminate\Http\JsonResponse
+     * @param string|null $message
+     * @param int $code
+     * @param array|null $data
+     * @return JsonResponse
      */
-    protected function error(string $message = null, int $code = 400, $data = null)
+    protected function error(string $message = null, int $code = 400, $data = []): JsonResponse
     {
         $params = [
             'success' => false,

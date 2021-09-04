@@ -54,7 +54,7 @@ class RecordService
     {
         $minutes = $minutes ? (int)$minutes : Record::DEADLINE_MINUTES_DEFAULT;
         $deadline = (new \DateTime())->modify("+ $minutes minutes");
-        $record->deadline_at = $deadline->format('Y-m-d H:i:s');
+        $record->deadline_at = $deadline;
         $record->save();
         return $record;
     }
@@ -65,6 +65,8 @@ class RecordService
         $channel = $record->channel;
 
         $channelRecipientRecord = $this->recipientService->getChannelRecipientRecord($recipient, $channel);
+
+        // @phpstan-ignore-next-line
         if (!$channelRecipientRecord) {
             throw new RecordException('Данный канал недоступен');
         }

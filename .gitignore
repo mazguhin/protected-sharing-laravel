@@ -18,3 +18,5 @@ supervisord.log
 /docker/supervisor/logs
 /docker/nginx/log
 storage/api-docs/api-docs.json
+phpcs.xml
+phpstan.neon
