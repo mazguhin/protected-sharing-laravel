@@ -23,8 +23,7 @@ class RecordService
         ChannelService $channelService,
         RecipientService $recipientService,
         RecordRepository $recordRepository
-    )
-    {
+    ) {
         $this->channelService = $channelService;
         $this->recipientService = $recipientService;
         $this->recordRepository = $recordRepository;

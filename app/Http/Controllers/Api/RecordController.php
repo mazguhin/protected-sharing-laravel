@@ -50,8 +50,7 @@ class RecordController extends Controller
         StoreRecord $request,
         RecordService $recordService,
         PasswordHelper $passwordHelper
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $recipient = Recipient::find($request->recipient_id);
         $channel = Channel::find($request->channel_id);
         $password = $passwordHelper->generatePassword();
@@ -117,8 +116,7 @@ class RecordController extends Controller
         AcceptRecord $request,
         RecordRepository $recordRepository,
         RecordService $recordService
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $record = $recordRepository->findActiveByIdentifier($request->identifier);
         if (!$record) {
             return $this->error('Запись не найдена', 400);

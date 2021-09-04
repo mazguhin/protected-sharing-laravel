@@ -19,13 +19,13 @@ class StoreRecord extends BaseRequest
                 'required',
                 'integer',
                 'exists:' . (new Recipient())->getTable() . ',id',
-                new ActiveRecipient
+                new ActiveRecipient()
             ],
             'channel_id' => [
                 'required',
                 'integer',
                 'exists:' . (new Channel())->getTable() . ',id',
-                new ActiveChannel
+                new ActiveChannel()
             ],
         ];
     }

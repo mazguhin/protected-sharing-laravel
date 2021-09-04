@@ -20,3 +20,18 @@ $ docker-compose -f docker-compose.local.yml run composer install
 ```bash
 $ docker-compose -f docker-compose.local.yml run artisan migrate 
 ```
+
+**PHPStan**
+```bash
+$ docker-compose -f docker-compose.local.yml run php ./vendor/bin/phpstan analyse --memory-limit=2G
+```
+
+**PHPCS**
+```bash
+$ docker-compose -f docker-compose.local.yml run php ./vendor/bin/phpcs
+```
+
+**PHPCBF**
+```bash
+$ docker-compose -f docker-compose.local.yml run php ./vendor/bin/phpcbf
+```

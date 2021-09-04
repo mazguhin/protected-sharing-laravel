@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
@@ -31,15 +32,13 @@ class CorsMiddleware
             'Access-Control-Allow-Headers'     => 'Content-Type, Authorization, X-Requested-With, X-XSRF-Token, Origin',
         ];
 
-        if ($request->isMethod('OPTIONS'))
-        {
+        if ($request->isMethod('OPTIONS')) {
             return response()->json('{"method":"OPTIONS"}', 200, $headers);
         }
 
         $response = $next($request);
 
-        foreach($headers as $key => $value)
-        {
+        foreach ($headers as $key => $value) {
             if (get_class($response) === 'Illuminate\Http\Request') {
                 $response->header($key, $value);
             } else {

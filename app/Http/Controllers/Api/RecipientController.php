@@ -21,8 +21,7 @@ class RecipientController extends Controller
     public function __construct(
         RecipientRepository $recipientRepository,
         RecipientService $recipientService
-    )
-    {
+    ) {
         $this->recipientRepository = $recipientRepository;
         $this->recipientService = $recipientService;
     }
@@ -158,8 +157,7 @@ class RecipientController extends Controller
     public function attachChannel(
         AttachChannelToRecipient $request,
         ChannelRepository $channelRepository
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $recipient = $this->recipientRepository->findActiveById($request->recipient_id);
         $channel = $channelRepository->findActiveById($request->channel_id);
 
@@ -211,8 +209,7 @@ class RecipientController extends Controller
     public function detachChannel(
         DetachChannelFromRecipient $request,
         ChannelRepository $channelRepository
-    ):JsonResponse
-    {
+    ): JsonResponse {
         $recipient = $this->recipientRepository->findById($request->recipient_id);
         $channel = $channelRepository->findById($request->channel_id);
 

@@ -27,7 +27,7 @@ trait ApiResponser
         $params = [
             'success' => true,
         ];
-        if(!empty($data)) {
+        if (!empty($data)) {
             $params['data'] = $data;
         }
         return response()->json($params, $code);
@@ -48,10 +48,9 @@ trait ApiResponser
             'code' => $code,
             'message' => $message,
         ];
-        if(!empty($data)) {
+        if (!empty($data)) {
             $params['data'] = $data;
         }
         return response()->json($params, $code);
     }
-
 }

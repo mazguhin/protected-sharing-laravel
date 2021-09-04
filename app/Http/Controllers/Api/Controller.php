@@ -10,7 +10,10 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Controller extends BaseController
 {
-    use ApiResponser, AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use ApiResponser;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
 
     /**
      * @OA\Info(

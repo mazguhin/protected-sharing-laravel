@@ -17,7 +17,7 @@ class DetachChannelFromRecipient extends BaseRequest
                 'required',
                 'integer',
                 'exists:' . (new Recipient())->getTable() . ',id',
-                new ActiveRecipient
+                new ActiveRecipient()
             ],
             'channel_id' => [
                 'required',
